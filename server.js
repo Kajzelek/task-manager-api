@@ -142,7 +142,6 @@ app.put('/api/tasks/:id', (req, res) => {
             error: error.message
         });
     }
-
 });
 
 app.patch('/api/tasks/:id/toggle', (req,res) => {
@@ -171,8 +170,97 @@ app.patch('/api/tasks/:id/toggle', (req,res) => {
     }
 });
 
+app.patch('/api/tasks/:id', (req,res) => {
+    try{
+        const taskId = parseInt(req.params.id);
+        const updates = {};
+
+        if(req.body.title !== undefined){
+            updates.title = req.body.title.trim();
+        }
+        if(req.body.completed !== undefined){
+            updates.completed = req.body.completed;
+        }
+
+        if(Object.keys(updates).length === 0){
+            return res.status(400).json({
+                success: false,
+                message: 'No valid fields to update'
+            });
+        }
+
+        const updatedTask = taskStore.update(taskId, updates);
+
+        if(!updatedTask){
+            return res.status(404).json({
+                success: false,
+                message: 'cannot find a task with given id',
+                error: error.message
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Task updated successfully!',
+            data: updatedTask
+        });
+
+    }
+    catch(error){
+        res.status(500),json({
+            success: false,
+            message: 'Error updating task',
+            error: error.message
+        });
+    }
+});
 
 
+app.delete('api/tasks/:id', (req,res) => {
+    try{
+        const taskId = parseInt(req.params.id);
+        const deletedTask = taskStore.delete(taskId);
+
+        if(!deletedTask){
+            return res.status(404).json({
+                success: false,
+                message: 'Cannot find task with given Id'
+            });
+        }
+
+        res.json({
+        success: true,
+        message: 'Task deleted successfully',
+        data: deletedTask
+        });
+    }
+    catch(error){
+        res.status(500).json({
+        success: false,
+        message: 'Error deleting task',
+        error: error.message
+    }); 
+    }
+});
+
+app.delete('/api/tasks', (req,res) => {
+    try{
+        const deletedTasks = taskStore.clearAll();
+        if(!deletedTasks.length){
+            return res.status(200).json({
+                success: true,
+                message: 'Tasks have been cleared correctly!'
+            });
+        }
+    }
+    catch(error){
+        res.status(500).json({
+            success: false,
+            message: 'Error clearing tasks',
+            error: error.message
+        });
+    }
+});
 
 
 
