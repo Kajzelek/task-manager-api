@@ -22,7 +22,10 @@ export const getTaskById = (req, res, next) => {
 
 export const createTask = (req, res, next) => {
     try{
-        const task = taskService.createTask(req.body)
+        const task = taskService.createTask({
+            ...req.body,
+            userId: req.user?.userId
+        })
         res.status(201).json(task)
     }
     catch(err){

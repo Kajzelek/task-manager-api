@@ -1,6 +1,7 @@
 import * as usersStore from '../data/users.store.js'
 import bcrypt from 'bcrypt'
 import {randomUUID} from 'crypto'
+import jwt from 'jsonwebtoken'
 
 export const register = async ({email, password}) => {
 
@@ -56,6 +57,12 @@ export const login = async ({email, password}) => {
         throw error
     }
 
+    const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'})
+
     const {passwordHash , ...safeUser} = user
-    return safeUser
+
+    return {
+        user: safeUser,
+        token: token
+    }
 }

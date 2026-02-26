@@ -16,7 +16,7 @@ export const getTask = (id) => {
     return task
 }
 
-export const createTask = ({title, description}) => {
+export const createTask = ({title, description, userId}) => {
     if(!title){
         const error = new Error("Title is required")
         error.status = 400
@@ -27,7 +27,8 @@ export const createTask = ({title, description}) => {
         id: randomUUID(),
         title: title,
         description: description,
-        completed: false
+        completed: false,
+        userId: userId
     }
 
     return store.create(newTask)
